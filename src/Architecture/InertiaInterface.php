@@ -3,6 +3,7 @@
 namespace Rompetomp\InertiaBundle\Architecture;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -133,6 +134,49 @@ interface InertiaInterface
      * @return LazyProp
      */
     public function lazy(callable|array|string $callback): LazyProp;
+
+    public function optional(mixed $value): OptionalProp;
+
+    public function always(mixed $value): AlwaysProp;
+
+    public function defer(
+        mixed $value,
+        string $group = 'default',
+        bool $rescue = false
+    ): DeferredProp;
+
+    public function merge(
+        mixed $value,
+        bool $prepend = false,
+        array|string|null $matchOn = null
+    ): MergeProp;
+
+    public function deepMerge(
+        mixed $value,
+        array|string|null $matchOn = null
+    ): MergeProp;
+
+    public function scroll(
+        mixed $value,
+        bool $prepend = false,
+        array|string|null $matchOn = null
+    ): ScrollProp;
+
+    public function once(mixed $value): OnceProp;
+
+    public function shareOnce(string $key, mixed $value = null): OnceProp;
+
+    public function encryptHistory(bool $encrypt = true): void;
+
+    public function clearHistory(bool $clear = true): void;
+
+    public function preserveFragment(bool $preserve = true): void;
+
+    public function resolveUrlUsing(?callable $resolver): void;
+
+    public function flash(string|array $key, mixed $value = null): void;
+
+    public function reflash(?Request $request = null): void;
 
     /**
      * Function that makes your controller return an Inertia response.

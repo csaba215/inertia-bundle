@@ -6,6 +6,7 @@ use Rompetomp\InertiaBundle\Architecture\DefaultInertiaErrorResponseInterface;
 use Rompetomp\InertiaBundle\Architecture\InertiaInterface;
 use Rompetomp\InertiaBundle\Architecture\InvalidCSRFErrorResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -72,6 +73,8 @@ class InertiaListener
             $request->headers->get('X-Inertia-Version') !==
                 $this->inertia->getVersion()
         ) {
+            $this->inertia->reflash($request);
+
             $response = new Response('', Response::HTTP_CONFLICT, [
                 'X-Inertia-Location' => $request->getUri(),
             ]);
@@ -100,6 +103,9 @@ class InertiaListener
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
+
+        $event->getResponse()->setVary('X-Inertia', false);
+
         /**
          * If the CSRF protection is enabled, we need to refresh the CSRF token.
          * We add this cookie to any request, not just Inertia requests.
@@ -140,6 +146,44 @@ class InertiaListener
             $event
                 ->getResponse()
                 ->headers->set('Symfony-Debug-Toolbar-Replace', 1);
+        }
+
+        if (
+            $event->getResponse()->isOk() &&
+            $event->getResponse()->getContent() === ''
+        ) {
+            $event->setResponse(
+                new RedirectResponse(
+                    $event->getRequest()->headers->get(
+                        'Referer',
+                        $event->getRequest()->getUri()
+                    )
+                )
+            );
+        }
+
+        if ($event->getResponse()->isRedirect()) {
+            $this->inertia->reflash($event->getRequest());
+        }
+
+        /**
+         * Fragment redirects use a 409 response so the client can preserve the
+         * fragment during a normal Inertia visit.
+         */
+        if (
+            $event->getResponse() instanceof RedirectResponse &&
+            str_contains($event->getResponse()->getTargetUrl(), '#') &&
+            $event->getRequest()->headers->get('Purpose') !== 'prefetch'
+        ) {
+            $event->setResponse(
+                new Response('', Response::HTTP_CONFLICT, [
+                    'X-Inertia-Redirect' => $event
+                        ->getResponse()
+                        ->getTargetUrl(),
+                ])
+            );
+
+            return;
         }
 
         /**

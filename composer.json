@@ -1,6 +1,6 @@
 {
   "name": "skipthedragon/inertia-bundle",
-  "description": "Inertia.js server-side adapter for Symfony 4, 5, 6 and 7.",
+  "description": "Inertia.js server-side adapter for maintained Symfony versions.",
   "keywords": [
     "Symfony",
     "bundle",
@@ -37,25 +37,25 @@
     ]
   },
   "require": {
-    "php": "^8",
+    "php": "^8.1",
     "ext-json": "*",
-    "symfony/config": "^5.1.7|^6.0|^7.0|^8.0",
-    "symfony/dependency-injection": "^5.1.7|^6.0|^7.0|^8.0",
-    "symfony/http-kernel": "^5.1.7|^6.0|^7.0|^8.0",
-    "symfony/twig-bundle": "^5.1.7|^6.0|^7.0|^8.0",
+    "symfony/config": "^6.4|^7.4|^8.0",
+    "symfony/dependency-injection": "^6.4|^7.4|^8.0",
+    "symfony/http-kernel": "^6.4|^7.4|^8.0",
+    "symfony/twig-bundle": "^6.4|^7.4|^8.0",
     "symfony/serializer-pack": "^v1.3.0",
     "twig/extra-bundle": "^2.12|^3.0",
     "twig/twig": "^2.12|^3.0",
-    "symfony/http-client": "^5.1.7|^6.0|^7.0|^8.0",
-    "symfony/security-csrf": "^5.1.7|^6.0|^7.0|^8.0"
+    "symfony/http-client": "^6.4|^7.4|^8.0",
+    "symfony/security-csrf": "^6.4|^7.4|^8.0"
   },
   "require-dev": {
     "mockery/mockery": "^1.2",
-    "symfony/phpunit-bridge": "^5.1.7|^6.0|^7.0|^8.0",
-    "symfony/property-access": "^5.1|^6.0|^7.0|^8.0",
-    "symfony/serializer": "^5.1|^6.0|^7.0|^8.0",
-    "symfony/framework-bundle": "^5.1|^6.4|^7.0|^8.0",
-    "symfony/var-dumper": "^5.1.7|^6.0|^7.0|^8.0",
-    "symfony/yaml": "^5.1.7|^6.0|^7.0|^8.0"
+    "symfony/phpunit-bridge": "^6.4|^7.4|^8.0",
+    "symfony/property-access": "^6.4|^7.4|^8.0",
+    "symfony/serializer": "^6.4|^7.4|^8.0",
+    "symfony/framework-bundle": "^6.4|^7.4|^8.0",
+    "symfony/var-dumper": "^6.4|^7.4|^8.0",
+    "symfony/yaml": "^6.4|^7.4|^8.0"
   }
 }

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class AttributesTest extends InertiaBaseConfig
 {
@@ -62,8 +63,46 @@ class AttributesTest extends InertiaBaseConfig
 
         $listener->onKernelView($event);
         $this->assertEquals(
-            '{"component":"Index","props":[],"url":null,"version":null}',
+            '{"component":"Index","props":{"errors":{}},"url":null,"version":null}',
             $event->getResponse()->getContent()
         );
+    }
+
+    public function testSubscribedEvents()
+    {
+        $this->assertSame(
+            [KernelEvents::VIEW => ['onKernelView', -128]],
+            InertiaResponseAttributeListener::getSubscribedEvents()
+        );
+    }
+
+    public function testViewListenerIgnoresNonArrayControllerResult()
+    {
+        $listener = new InertiaResponseAttributeListener($this->inertia);
+        $event = new ViewEvent(
+            $this->createMock(HttpKernelInterface::class),
+            Request::create('http://localhost/'),
+            HttpKernelInterface::MAIN_REQUEST,
+            new \stdClass()
+        );
+
+        $listener->onKernelView($event);
+
+        $this->assertFalse($event->hasResponse());
+    }
+
+    public function testViewListenerIgnoresMissingAttribute()
+    {
+        $listener = new InertiaResponseAttributeListener($this->inertia);
+        $event = new ViewEvent(
+            $this->createMock(HttpKernelInterface::class),
+            Request::create('http://localhost/'),
+            HttpKernelInterface::MAIN_REQUEST,
+            []
+        );
+
+        $listener->onKernelView($event);
+
+        $this->assertFalse($event->hasResponse());
     }
 }

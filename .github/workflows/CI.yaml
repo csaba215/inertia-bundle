@@ -28,9 +28,19 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0', '8.1', '8.2']
+        php-versions: ['8.1', '8.2', '8.3', '8.4', '8.5']
+        symfony-versions: ['6.4.*', '7.4.*', '8.0.*']
+        exclude:
+          - php-versions: '8.1'
+            symfony-versions: '7.4.*'
+          - php-versions: '8.1'
+            symfony-versions: '8.0.*'
+          - php-versions: '8.2'
+            symfony-versions: '8.0.*'
+          - php-versions: '8.3'
+            symfony-versions: '8.0.*'
 
-    name: Tests on PHP ${{ matrix.php-versions }}
+    name: Tests on PHP ${{ matrix.php-versions }} / Symfony ${{ matrix.symfony-versions }}
 
     steps:
       - name: Checkout
@@ -43,7 +53,24 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        run: composer install --ansi --no-progress
+        run: |-
+          composer require \
+            symfony/config:${{ matrix.symfony-versions }} \
+            symfony/dependency-injection:${{ matrix.symfony-versions }} \
+            symfony/http-kernel:${{ matrix.symfony-versions }} \
+            symfony/twig-bundle:${{ matrix.symfony-versions }} \
+            symfony/http-client:${{ matrix.symfony-versions }} \
+            symfony/security-csrf:${{ matrix.symfony-versions }} \
+            symfony/phpunit-bridge:${{ matrix.symfony-versions }} \
+            symfony/property-access:${{ matrix.symfony-versions }} \
+            symfony/serializer:${{ matrix.symfony-versions }} \
+            symfony/framework-bundle:${{ matrix.symfony-versions }} \
+            symfony/var-dumper:${{ matrix.symfony-versions }} \
+            symfony/yaml:${{ matrix.symfony-versions }} \
+            --ansi \
+            --no-interaction \
+            --no-progress \
+            --with-all-dependencies
 
       - name: PHPUnit Tests
         run: vendor/bin/simple-phpunit

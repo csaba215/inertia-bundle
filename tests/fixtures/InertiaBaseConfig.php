@@ -55,7 +55,7 @@ class InertiaBaseConfig extends TestCase
         );
     }
 
-    private static function createContainerBuilder(
+    protected static function createContainerBuilder(
         array $configs = []
     ): ContainerBuilder {
         $container = new ContainerBuilder(
@@ -70,17 +70,26 @@ class InertiaBaseConfig extends TestCase
                 'kernel.environment' => 'test',
                 'kernel.name' => 'kernel',
                 'kernel.root_dir' => __DIR__,
-                'kernel.project_dir' => __DIR__,
+                'kernel.project_dir' =>
+                    $configs['kernel_project_dir'] ?? dirname(__DIR__, 2),
+                'kernel.share_dir' => __DIR__,
                 'kernel.container_class' => 'AutowiringTestContainer',
                 'kernel.charset' => 'utf8',
                 'kernel.runtime_environment' => 'test',
+                'kernel.runtime_mode.web' => true,
                 'kernel.build_dir' => __DIR__,
                 'debug.file_link_format' => null,
+                'env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)' => false,
+                'env(default::SYMFONY_TRUSTED_HOSTS)' => '',
+                'env(default::SYMFONY_TRUSTED_PROXIES)' => '',
+                'env(default::SYMFONY_TRUSTED_HEADERS)' => '',
             ])
         );
 
         $container->registerExtension(new FrameworkExtension());
         $container->registerExtension(new InertiaExtension());
+
+        unset($configs['kernel_project_dir']);
 
         foreach ($configs as $extension => $config) {
             $container->loadFromExtension($extension, $config);
