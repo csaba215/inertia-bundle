@@ -297,7 +297,11 @@ class InertiaService implements InertiaInterface
 
         $context = array_merge($this->sharedContext, $context);
         $viewData = array_merge($this->sharedViewData, $viewData);
-        $props = array_merge($this->sharedProps, $this->sharedOnceProps, $props);
+        $props = array_merge(
+            $this->sharedProps,
+            $this->sharedOnceProps,
+            $props
+        );
         $request = $this->requestStack->getCurrentRequest();
         $this->ensureComponentExists($component);
         $props = $this->withDefaultErrorsProp($props, $request);
@@ -436,7 +440,11 @@ class InertiaService implements InertiaInterface
         string $group = 'default',
         bool $rescue = false
     ): DeferredProp {
-        return new DeferredProp($this->normalizeCallback($value), $group, $rescue);
+        return new DeferredProp(
+            $this->normalizeCallback($value),
+            $group,
+            $rescue
+        );
     }
 
     public function merge(
@@ -456,7 +464,12 @@ class InertiaService implements InertiaInterface
         mixed $value,
         array|string|null $matchOn = null
     ): MergeProp {
-        return new MergeProp($this->normalizeCallback($value), true, false, $matchOn);
+        return new MergeProp(
+            $this->normalizeCallback($value),
+            true,
+            false,
+            $matchOn
+        );
     }
 
     public function scroll(
@@ -620,8 +633,10 @@ class InertiaService implements InertiaInterface
         return (array) json_decode($json, false);
     }
 
-    private function withDefaultErrorsProp(array $props, Request $request): array
-    {
+    private function withDefaultErrorsProp(
+        array $props,
+        Request $request
+    ): array {
         if (array_key_exists('errors', $props)) {
             return $props;
         }
@@ -729,11 +744,16 @@ class InertiaService implements InertiaInterface
         ) {
             return hash(
                 'xxh128',
-                (string) $this->container->getParameter('inertia.version.asset_url')
+                (string) $this->container->getParameter(
+                    'inertia.version.asset_url'
+                )
             );
         }
 
-        foreach ($this->getArrayParameter('inertia.version.manifest_paths') as $path) {
+        foreach (
+            $this->getArrayParameter('inertia.version.manifest_paths')
+            as $path
+        ) {
             if (is_file($path)) {
                 return hash_file('xxh128', $path);
             }
@@ -788,9 +808,10 @@ class InertiaService implements InertiaInterface
 
                 $messages = method_exists($flashBag, 'peek')
                     ? $flashBag->peek($key, [])
-                    : ($flashBag->peekAll()[$key] ?? []);
+                    : $flashBag->peekAll()[$key] ?? [];
 
-                $flash[$key] = count($messages) === 1 ? reset($messages) : $messages;
+                $flash[$key] =
+                    count($messages) === 1 ? reset($messages) : $messages;
             }
         }
 
@@ -799,14 +820,18 @@ class InertiaService implements InertiaInterface
 
     private function shouldClearHistory(Request $request): bool
     {
-        return $this->pullSessionFlag($request, self::CLEAR_HISTORY_SESSION_KEY) ||
-            $this->clearHistory;
+        return $this->pullSessionFlag(
+            $request,
+            self::CLEAR_HISTORY_SESSION_KEY
+        ) || $this->clearHistory;
     }
 
     private function shouldPreserveFragment(Request $request): bool
     {
-        return $this->pullSessionFlag($request, self::PRESERVE_FRAGMENT_SESSION_KEY) ||
-            $this->preserveFragment;
+        return $this->pullSessionFlag(
+            $request,
+            self::PRESERVE_FRAGMENT_SESSION_KEY
+        ) || $this->preserveFragment;
     }
 
     private function storeSessionFlag(string $key): void
@@ -867,7 +892,11 @@ class InertiaService implements InertiaInterface
         $query = parse_url($url, PHP_URL_QUERY);
         $rawPath = parse_url($request->getRequestUri(), PHP_URL_PATH) ?: '';
 
-        if ($rawPath !== '' && str_ends_with($rawPath, '/') && !str_ends_with($path, '/')) {
+        if (
+            $rawPath !== '' &&
+            str_ends_with($rawPath, '/') &&
+            !str_ends_with($path, '/')
+        ) {
             $path .= '/';
         }
 
@@ -877,7 +906,9 @@ class InertiaService implements InertiaInterface
     private function ensureComponentExists(string $component): void
     {
         if (
-            !$this->container->hasParameter('inertia.pages.ensure_pages_exist') ||
+            !$this->container->hasParameter(
+                'inertia.pages.ensure_pages_exist'
+            ) ||
             !$this->container->getParameter('inertia.pages.ensure_pages_exist')
         ) {
             return;
@@ -887,10 +918,12 @@ class InertiaService implements InertiaInterface
             return;
         }
 
-        throw new RuntimeError(sprintf(
-            'Inertia page component "%s" does not exist in configured paths.',
-            $component
-        ));
+        throw new RuntimeError(
+            sprintf(
+                'Inertia page component "%s" does not exist in configured paths.',
+                $component
+            )
+        );
     }
 
     private function componentExists(string $component): bool
@@ -900,7 +933,8 @@ class InertiaService implements InertiaInterface
 
         foreach ($paths as $path) {
             foreach ($extensions as $extension) {
-                $file = rtrim($path, DIRECTORY_SEPARATOR) .
+                $file =
+                    rtrim($path, DIRECTORY_SEPARATOR) .
                     DIRECTORY_SEPARATOR .
                     str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $component) .
                     '.' .
@@ -923,7 +957,11 @@ class InertiaService implements InertiaInterface
 
         $values = [];
 
-        for ($index = 0; $this->container->hasParameter($name . '.' . $index); $index++) {
+        for (
+            $index = 0;
+            $this->container->hasParameter($name . '.' . $index);
+            $index++
+        ) {
             $values[] = $this->container->getParameter($name . '.' . $index);
         }
 
@@ -935,8 +973,7 @@ class InertiaService implements InertiaInterface
         $request = $this->requestStack->getCurrentRequest();
 
         if (
-            $request->headers->get('X-Inertia-Partial-Component') !==
-            $component
+            $request->headers->get('X-Inertia-Partial-Component') !== $component
         ) {
             return $this->filterDefaultProps($props);
         }
@@ -949,7 +986,11 @@ class InertiaService implements InertiaInterface
 
             foreach ($only as $path) {
                 if (self::hasPath($props, $path)) {
-                    self::setPath($filtered, $path, self::getPath($props, $path));
+                    self::setPath(
+                        $filtered,
+                        $path,
+                        self::getPath($props, $path)
+                    );
                 }
             }
         } else {
@@ -999,7 +1040,11 @@ class InertiaService implements InertiaInterface
                 $prop = $prop();
             }
         } catch (\Throwable $exception) {
-            if ($prop instanceof Prop && $prop->isDeferred() && $prop->shouldRescue()) {
+            if (
+                $prop instanceof Prop &&
+                $prop->isDeferred() &&
+                $prop->shouldRescue()
+            ) {
                 $rescuedProps[] = $path;
 
                 return $this->missingProp;
@@ -1032,7 +1077,9 @@ class InertiaService implements InertiaInterface
     {
         $deferred = [];
 
-        $this->walkProps($props, function (string $path, mixed $prop) use (&$deferred): void {
+        $this->walkProps($props, function (string $path, mixed $prop) use (
+            &$deferred
+        ): void {
             if ($prop instanceof Prop && $prop->isDeferred()) {
                 $deferred[$prop->getGroup()][] = $path;
             }
@@ -1041,10 +1088,13 @@ class InertiaService implements InertiaInterface
         return $deferred;
     }
 
-    private function filterDefaultProps(array $props, string $prefix = ''): array
-    {
+    private function filterDefaultProps(
+        array $props,
+        string $prefix = ''
+    ): array {
         foreach ($props as $key => $prop) {
-            $path = $prefix === '' ? (string) $key : $prefix . '.' . (string) $key;
+            $path =
+                $prefix === '' ? (string) $key : $prefix . '.' . (string) $key;
 
             if (
                 $prop instanceof Prop &&
@@ -1075,7 +1125,9 @@ class InertiaService implements InertiaInterface
     {
         $once = [];
 
-        $this->walkProps($props, function (string $path, mixed $prop) use (&$once): void {
+        $this->walkProps($props, function (string $path, mixed $prop) use (
+            &$once
+        ): void {
             if ($prop instanceof Prop && $prop->isOnce()) {
                 $key = $prop->getOnceKey($path);
                 $once[$key] = [
@@ -1099,9 +1151,12 @@ class InertiaService implements InertiaInterface
         ];
         $reset = $this->parseHeaderList('X-Inertia-Reset');
 
-        $this->walkProps($props, function (string $path, mixed $prop) use (&$metadata, $reset): void {
+        $this->walkProps($props, function (string $path, mixed $prop) use (
+            &$metadata,
+            $reset
+        ): void {
             if (
-                !$prop instanceof Prop ||
+                !($prop instanceof Prop) ||
                 !$prop->isMerge() ||
                 in_array($path, $reset, true)
             ) {
@@ -1161,10 +1216,13 @@ class InertiaService implements InertiaInterface
         );
     }
 
-    private function removeSkippedOnceProps(array &$props, string $prefix = ''): void
-    {
+    private function removeSkippedOnceProps(
+        array &$props,
+        string $prefix = ''
+    ): void {
         foreach ($props as $key => &$prop) {
-            $path = $prefix === '' ? (string) $key : $prefix . '.' . (string) $key;
+            $path =
+                $prefix === '' ? (string) $key : $prefix . '.' . (string) $key;
 
             if (
                 $prop instanceof Prop &&
@@ -1209,7 +1267,8 @@ class InertiaService implements InertiaInterface
         string $prefix = ''
     ): void {
         foreach ($props as $key => $prop) {
-            $path = $prefix === '' ? (string) $key : $prefix . '.' . (string) $key;
+            $path =
+                $prefix === '' ? (string) $key : $prefix . '.' . (string) $key;
             $callback($path, $prop);
 
             if (is_array($prop)) {
@@ -1224,7 +1283,10 @@ class InertiaService implements InertiaInterface
 
         return array_values(
             array_filter(
-                array_map('trim', explode(',', $request->headers->get($header) ?? ''))
+                array_map(
+                    'trim',
+                    explode(',', $request->headers->get($header) ?? '')
+                )
             )
         );
     }
@@ -1251,8 +1313,11 @@ class InertiaService implements InertiaInterface
         return $array;
     }
 
-    private static function setPath(array &$array, string $path, mixed $value): void
-    {
+    private static function setPath(
+        array &$array,
+        string $path,
+        mixed $value
+    ): void {
         $target = &$array;
 
         foreach (explode('.', $path) as $segment) {

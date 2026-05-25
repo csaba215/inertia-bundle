@@ -19,9 +19,7 @@ class InertiaResponseAttributeListener implements EventSubscriberInterface
     /**
      * @param InertiaInterface $inertia
      */
-    public function __construct(protected InertiaInterface $inertia)
-    {
-    }
+    public function __construct(protected InertiaInterface $inertia) {}
 
     /**
      * @param ViewEvent $event
@@ -38,7 +36,7 @@ class InertiaResponseAttributeListener implements EventSubscriberInterface
         $attribute = $event->getRequest()->attributes->get('_template');
 
         if (
-            !$attribute instanceof InertiaResponse &&
+            !($attribute instanceof InertiaResponse) &&
             !($attribute =
                 $event->controllerArgumentsEvent?->getAttributes()[
                     InertiaResponse::class

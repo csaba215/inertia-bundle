@@ -78,7 +78,10 @@ class InertiaServiceTest extends InertiaBaseConfig
         $this->inertia->setSsrUrl('http://localhost:13714');
 
         $this->assertTrue($this->inertia->isSsr());
-        $this->assertSame('http://localhost:13714', $this->inertia->getSsrUrl());
+        $this->assertSame(
+            'http://localhost:13714',
+            $this->inertia->getSsrUrl()
+        );
     }
 
     public function testRenderJSON()
@@ -221,7 +224,9 @@ class InertiaServiceTest extends InertiaBaseConfig
 
         $this->assertArrayNotHasKey('lazyValue', $data['props']);
 
-        $this->requestStack = \Mockery::mock(\Symfony\Component\HttpFoundation\RequestStack::class);
+        $this->requestStack = \Mockery::mock(
+            \Symfony\Component\HttpFoundation\RequestStack::class
+        );
         $this->bootInertiaRequest([
             'X-Inertia' => true,
             'X-Inertia-Partial-Component' => 'Dashboard',
@@ -258,10 +263,15 @@ class InertiaServiceTest extends InertiaBaseConfig
             ->getCurrentRequest()
             ->andReturns($request);
 
-        $response = $this->inertia->location(new \Symfony\Component\HttpFoundation\RedirectResponse('/login'));
+        $response = $this->inertia->location(
+            new \Symfony\Component\HttpFoundation\RedirectResponse('/login')
+        );
 
         $this->assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
-        $this->assertSame('/login', $response->headers->get('X-Inertia-Location'));
+        $this->assertSame(
+            '/login',
+            $response->headers->get('X-Inertia-Location')
+        );
     }
 
     public function testPartialReloadSupportsOnlyExceptAndDotNotation()
@@ -269,7 +279,8 @@ class InertiaServiceTest extends InertiaBaseConfig
         $this->bootInertiaRequest([
             'X-Inertia' => true,
             'X-Inertia-Partial-Component' => 'Dashboard',
-            'X-Inertia-Partial-Data' => 'auth.user, optionalValue, deferredValue',
+            'X-Inertia-Partial-Data' =>
+                'auth.user, optionalValue, deferredValue',
             'X-Inertia-Partial-Except' => 'auth.user.password',
         ]);
 
@@ -376,7 +387,10 @@ class InertiaServiceTest extends InertiaBaseConfig
             $data['scrollProps']['feed']
         );
         $this->assertSame(['rows.id'], $data['matchPropsOn']);
-        $this->assertArrayNotHasKey('resetRows', array_flip($data['mergeProps']));
+        $this->assertArrayNotHasKey(
+            'resetRows',
+            array_flip($data['mergeProps'])
+        );
     }
 
     public function testMergeWrapperSupportsTargetedPathsAndScrollMetadata()
@@ -438,14 +452,23 @@ class InertiaServiceTest extends InertiaBaseConfig
         ]);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame(['alwaysRows' => ['data' => []], 'errors' => []], $data['props']);
-        $this->assertSame(['tables' => ['deferredRows'], 'default' => ['deferredTree']], $data['deferredProps']);
+        $this->assertSame(
+            ['alwaysRows' => ['data' => []], 'errors' => []],
+            $data['props']
+        );
+        $this->assertSame(
+            ['tables' => ['deferredRows'], 'default' => ['deferredTree']],
+            $data['deferredProps']
+        );
         $this->assertSame(
             ['deferredRows.data', 'optionalFeed.data', 'alwaysRows'],
             $data['mergeProps']
         );
         $this->assertSame(['deferredTree'], $data['deepMergeProps']);
-        $this->assertSame(['deferredRows.data.id', 'optionalFeed.data.id'], $data['matchPropsOn']);
+        $this->assertSame(
+            ['deferredRows.data.id', 'optionalFeed.data.id'],
+            $data['matchPropsOn']
+        );
         $this->assertSame(
             [
                 'pageName' => 'page',
@@ -497,14 +520,18 @@ class InertiaServiceTest extends InertiaBaseConfig
                 ->once(fn() => ['admin'])
                 ->as('roles')
                 ->until(60),
-            'plans' => $this->inertia
-                ->once(fn() => ['basic'])
-                ->fresh(),
+            'plans' => $this->inertia->once(fn() => ['basic'])->fresh(),
         ]);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame(['plans' => ['basic'], 'errors' => []], $data['props']);
-        $this->assertSame('availableRoles', $data['onceProps']['roles']['prop']);
+        $this->assertSame(
+            ['plans' => ['basic'], 'errors' => []],
+            $data['props']
+        );
+        $this->assertSame(
+            'availableRoles',
+            $data['onceProps']['roles']['prop']
+        );
         $this->assertIsInt($data['onceProps']['roles']['expiresAt']);
         $this->assertSame(
             ['prop' => 'plans', 'expiresAt' => null],
@@ -526,7 +553,10 @@ class InertiaServiceTest extends InertiaBaseConfig
         ]);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame(['roles' => ['admin'], 'errors' => []], $data['props']);
+        $this->assertSame(
+            ['roles' => ['admin'], 'errors' => []],
+            $data['props']
+        );
         $this->assertSame(
             ['prop' => 'roles', 'expiresAt' => null],
             $data['onceProps']['roles']
@@ -537,7 +567,9 @@ class InertiaServiceTest extends InertiaBaseConfig
     {
         $this->bootInertiaRequest(['X-Inertia' => true]);
         $this->inertia->share('auth', ['user' => 'Ada']);
-        $this->inertia->shareOnce('countries', fn() => ['HU'])->as('country-list');
+        $this->inertia
+            ->shareOnce('countries', fn() => ['HU'])
+            ->as('country-list');
         $this->inertia->encryptHistory();
         $this->inertia->clearHistory();
         $this->inertia->preserveFragment();
@@ -656,7 +688,9 @@ class InertiaServiceTest extends InertiaBaseConfig
         $data = json_decode($response->getContent(), true);
 
         $this->assertSame(['success' => 'Saved.'], $data['flash']);
-        $this->assertTrue($request->getSession()->getFlashBag()->has('success'));
+        $this->assertTrue(
+            $request->getSession()->getFlashBag()->has('success')
+        );
     }
 
     public function testHistoryAndFragmentFlagsSurviveThroughSession()
@@ -684,7 +718,9 @@ class InertiaServiceTest extends InertiaBaseConfig
 
         $this->assertTrue($data['clearHistory']);
         $this->assertTrue($data['preserveFragment']);
-        $this->assertFalse($request->getSession()->has('_inertia_clear_history'));
+        $this->assertFalse(
+            $request->getSession()->has('_inertia_clear_history')
+        );
         $this->assertFalse(
             $request->getSession()->has('_inertia_preserve_fragment')
         );
@@ -779,19 +815,23 @@ class InertiaServiceTest extends InertiaBaseConfig
             'items' => [1, 2],
         ]);
 
-        $this->assertInertia($response, fn($page) => $page
-            ->component('Dashboard')
-            ->hasAll(['auth.user.name' => 'Ada', 'items'])
-            ->whereAll(['auth.user.name' => 'Ada'])
-            ->whereType('auth.user.name', 'string')
-            ->scope('auth.user', fn($user) => $user
-                ->where('name', 'Ada')
-                ->missing('email')
-                ->missingAll(['email', 'id'])
-            )
-            ->count('items', 2)
-            ->encryptedHistory()
-            ->clearsHistory()
+        $this->assertInertia(
+            $response,
+            fn($page) => $page
+                ->component('Dashboard')
+                ->hasAll(['auth.user.name' => 'Ada', 'items'])
+                ->whereAll(['auth.user.name' => 'Ada'])
+                ->whereType('auth.user.name', 'string')
+                ->scope(
+                    'auth.user',
+                    fn($user) => $user
+                        ->where('name', 'Ada')
+                        ->missing('email')
+                        ->missingAll(['email', 'id'])
+                )
+                ->count('items', 2)
+                ->encryptedHistory()
+                ->clearsHistory()
         );
     }
 

@@ -15,9 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DashboardController extends AbstractController
 {
-  public function __construct(private InertiaInterface $inertia)
-  {
-  }
+  public function __construct(private InertiaInterface $inertia) {}
 
   public function index(): Response
   {

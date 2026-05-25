@@ -49,6 +49,5 @@ class InertiaResponse
          * Location to redirect to.
          */
         public ?string $url = null
-    ) {
-    }
+    ) {}
 }

@@ -7,7 +7,5 @@ class InertiaSsrResponse
     /**
      * Prepare the Inertia Server Side Rendering (SSR) response.
      */
-    public function __construct(public string $head, public string $body)
-    {
-    }
+    public function __construct(public string $head, public string $body) {}
 }

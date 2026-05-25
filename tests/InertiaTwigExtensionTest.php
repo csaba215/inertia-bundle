@@ -51,7 +51,9 @@ class InertiaTwigExtensionTest extends InertiaBaseConfig
             ->expects($this->once())
             ->method('dispatch')
             ->with(['component' => 'Dashboard'])
-            ->willReturn(new InertiaSsrResponse('<title>SSR</title>', '<div>SSR</div>'));
+            ->willReturn(
+                new InertiaSsrResponse('<title>SSR</title>', '<div>SSR</div>')
+            );
 
         $extension = new InertiaTwigExtension($this->inertia, $gateway);
 
@@ -70,13 +72,17 @@ class InertiaTwigExtensionTest extends InertiaBaseConfig
             ->expects($this->once())
             ->method('dispatch')
             ->with(['component' => 'Dashboard'])
-            ->willReturn(new InertiaSsrResponse('<title>SSR</title>', '<div>SSR</div>'));
+            ->willReturn(
+                new InertiaSsrResponse('<title>SSR</title>', '<div>SSR</div>')
+            );
 
         $extension = new InertiaTwigExtension($this->inertia, $gateway);
 
         $this->assertSame(
             '<title>SSR</title>',
-            (string) $extension->inertiaHeadFunction(['component' => 'Dashboard'])
+            (string) $extension->inertiaHeadFunction([
+                'component' => 'Dashboard',
+            ])
         );
     }
 

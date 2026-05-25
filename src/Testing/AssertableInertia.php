@@ -6,9 +6,10 @@ use PHPUnit\Framework\Assert;
 
 class AssertableInertia
 {
-    public function __construct(private array $page, private array $scope = [])
-    {
-    }
+    public function __construct(
+        private array $page,
+        private array $scope = []
+    ) {}
 
     public function component(string $component): static
     {
@@ -39,7 +40,10 @@ class AssertableInertia
         );
 
         if (func_num_args() >= 2) {
-            Assert::assertEquals($expected, $this->getPath($this->props(), $prop));
+            Assert::assertEquals(
+                $expected,
+                $this->getPath($this->props(), $prop)
+            );
         }
 
         return $this;
@@ -63,7 +67,10 @@ class AssertableInertia
     {
         Assert::assertFalse(
             $this->hasPath($this->props(), $prop),
-            sprintf('Failed asserting that Inertia prop "%s" is missing.', $prop)
+            sprintf(
+                'Failed asserting that Inertia prop "%s" is missing.',
+                $prop
+            )
         );
 
         return $this;

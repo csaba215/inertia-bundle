@@ -20,9 +20,18 @@ class ArchitectureTest extends TestCase
         $default = (new DefaultInertiaErrorResponse())->getResponse();
         $invalidCsrf = (new InvalidCSRFErrorResponse())->getResponse();
 
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $default->getStatusCode());
-        $this->assertSame('Something went wrong with Inertia!', $default->getContent());
-        $this->assertSame(Response::HTTP_FORBIDDEN, $invalidCsrf->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $default->getStatusCode()
+        );
+        $this->assertSame(
+            'Something went wrong with Inertia!',
+            $default->getContent()
+        );
+        $this->assertSame(
+            Response::HTTP_FORBIDDEN,
+            $invalidCsrf->getStatusCode()
+        );
         $this->assertSame('Invalid CSRF token.', $invalidCsrf->getContent());
     }
 
@@ -45,7 +54,10 @@ class ArchitectureTest extends TestCase
 
     public function testSsrResponseStoresHeadAndBody()
     {
-        $response = new InertiaSsrResponse('<title>Dashboard</title>', '<div>SSR</div>');
+        $response = new InertiaSsrResponse(
+            '<title>Dashboard</title>',
+            '<div>SSR</div>'
+        );
 
         $this->assertSame('<title>Dashboard</title>', $response->head);
         $this->assertSame('<div>SSR</div>', $response->body);

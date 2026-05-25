@@ -32,17 +32,13 @@ class SsrTest extends TestCase
         $httpClient
             ->expects($this->once())
             ->method('request')
-            ->with(
-                'POST',
-                'http://127.0.0.1:13714/render',
-                [
-                    'headers' => [
-                        'Content-Type: application/json',
-                        'Accept: application/json',
-                    ],
-                    'body' => json_encode($page),
-                ]
-            )
+            ->with('POST', 'http://127.0.0.1:13714/render', [
+                'headers' => [
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ],
+                'body' => json_encode($page),
+            ])
             ->willReturn($response);
 
         $inertia = $this->createMock(InertiaInterface::class);
@@ -51,7 +47,9 @@ class SsrTest extends TestCase
             ->method('getSsrUrl')
             ->willReturn('http://127.0.0.1:13714/render');
 
-        $ssrResponse = (new HttpGateway($httpClient, $inertia))->dispatch($page);
+        $ssrResponse = (new HttpGateway($httpClient, $inertia))->dispatch(
+            $page
+        );
 
         $this->assertSame(
             "<title>Dashboard</title>\n<meta name=\"x\">",

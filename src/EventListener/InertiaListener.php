@@ -30,8 +30,7 @@ class InertiaListener
         protected bool $debug,
         protected ContainerInterface $container,
         protected DefaultInertiaErrorResponseInterface $defaultInertiaErrorResponse
-    ) {
-    }
+    ) {}
 
     /**
      * @param RequestEvent $event
@@ -103,7 +102,6 @@ class InertiaListener
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-
         $event->getResponse()->setVary('X-Inertia', false);
 
         /**
@@ -154,10 +152,12 @@ class InertiaListener
         ) {
             $event->setResponse(
                 new RedirectResponse(
-                    $event->getRequest()->headers->get(
-                        'Referer',
-                        $event->getRequest()->getUri()
-                    )
+                    $event
+                        ->getRequest()
+                        ->headers->get(
+                            'Referer',
+                            $event->getRequest()->getUri()
+                        )
                 )
             );
         }

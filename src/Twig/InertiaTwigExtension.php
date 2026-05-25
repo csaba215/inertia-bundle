@@ -22,8 +22,7 @@ class InertiaTwigExtension extends AbstractExtension
     public function __construct(
         private InertiaInterface $inertia,
         private GatewayInterface $gateway
-    ) {
-    }
+    ) {}
 
     /**
      * Register the functions.

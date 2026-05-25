@@ -82,8 +82,10 @@ abstract class Prop
         return $this;
     }
 
-    public function defer(string $group = 'default', bool $rescue = false): static
-    {
+    public function defer(
+        string $group = 'default',
+        bool $rescue = false
+    ): static {
         $this->deferred = true;
         $this->deferredGroup = $group;
         $this->rescueDeferred = $rescue;
@@ -121,8 +123,10 @@ abstract class Prop
         return $this;
     }
 
-    public function append(array|string|null $paths = null, array|string|null $matchOn = null): static
-    {
+    public function append(
+        array|string|null $paths = null,
+        array|string|null $matchOn = null
+    ): static {
         $this->appendPaths = $this->normalizePaths($paths);
         $this->prepend = false;
         $this->matchOn = $matchOn ?? $this->matchOn;
@@ -131,8 +135,10 @@ abstract class Prop
         return $this;
     }
 
-    public function prepend(array|string|null $paths = null, array|string|null $matchOn = null): static
-    {
+    public function prepend(
+        array|string|null $paths = null,
+        array|string|null $matchOn = null
+    ): static {
         $this->prependPaths = $this->normalizePaths($paths);
         $this->prepend = true;
         $this->matchOn = $matchOn ?? $this->matchOn;
@@ -186,14 +192,15 @@ abstract class Prop
         return $this;
     }
 
-    public function until(\DateTimeInterface|\DateInterval|int|null $expiresAt): static
-    {
+    public function until(
+        \DateTimeInterface|\DateInterval|int|null $expiresAt
+    ): static {
         if ($expiresAt instanceof \DateTimeInterface) {
             $this->onceExpiresAt = $expiresAt->getTimestamp() * 1000;
         } elseif ($expiresAt instanceof \DateInterval) {
-            $this->onceExpiresAt = (new \DateTimeImmutable())
-                    ->add($expiresAt)
-                    ->getTimestamp() * 1000;
+            $this->onceExpiresAt =
+                (new \DateTimeImmutable())->add($expiresAt)->getTimestamp() *
+                1000;
         } elseif (is_int($expiresAt)) {
             $this->onceExpiresAt = (time() + $expiresAt) * 1000;
         } else {
@@ -273,11 +280,15 @@ abstract class Prop
 
             foreach ($this->matchOn as $path => $matchOn) {
                 if (is_int($path)) {
-                    $matches[] = $this->prefixPath($basePath, (string) $matchOn);
+                    $matches[] = $this->prefixPath(
+                        $basePath,
+                        (string) $matchOn
+                    );
                     continue;
                 }
 
-                $matches[] = $this->prefixPath($basePath, (string) $path) .
+                $matches[] =
+                    $this->prefixPath($basePath, (string) $path) .
                     '.' .
                     $matchOn;
             }
@@ -347,6 +358,8 @@ abstract class Prop
 
     private function prefixPath(string $basePath, mixed $path): string
     {
-        return $path === null || $path === '' ? $basePath : $basePath . '.' . $path;
+        return $path === null || $path === ''
+            ? $basePath
+            : $basePath . '.' . $path;
     }
 }

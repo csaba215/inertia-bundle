@@ -7,8 +7,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait InertiaAssertions
 {
-    protected function assertInertia(Response $response, ?callable $callback = null): array
-    {
+    protected function assertInertia(
+        Response $response,
+        ?callable $callback = null
+    ): array {
         $page = $this->inertiaPage($response);
 
         Assert::assertArrayHasKey('component', $page);
@@ -64,7 +66,10 @@ trait InertiaAssertions
 
         Assert::assertFalse(
             $this->hasInertiaPath($page['props'], $prop),
-            sprintf('Failed asserting that Inertia prop "%s" is missing.', $prop)
+            sprintf(
+                'Failed asserting that Inertia prop "%s" is missing.',
+                $prop
+            )
         );
 
         return $page;
@@ -128,7 +133,10 @@ trait InertiaAssertions
     ): array {
         $page = $this->assertInertiaHasProp($response, $prop);
 
-        Assert::assertEquals($expected, $this->getInertiaPath($page['props'], $prop));
+        Assert::assertEquals(
+            $expected,
+            $this->getInertiaPath($page['props'], $prop)
+        );
 
         return $page;
     }
@@ -151,7 +159,8 @@ trait InertiaAssertions
     ): void {
         foreach ($paths as $path) {
             foreach ($extensions as $extension) {
-                $file = rtrim($path, DIRECTORY_SEPARATOR) .
+                $file =
+                    rtrim($path, DIRECTORY_SEPARATOR) .
                     DIRECTORY_SEPARATOR .
                     str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $component) .
                     '.' .
@@ -164,10 +173,12 @@ trait InertiaAssertions
             }
         }
 
-        Assert::fail(sprintf(
-            'Failed asserting that Inertia component "%s" exists.',
-            $component
-        ));
+        Assert::fail(
+            sprintf(
+                'Failed asserting that Inertia component "%s" exists.',
+                $component
+            )
+        );
     }
 
     private function inertiaPage(Response $response): array
@@ -192,7 +203,9 @@ trait InertiaAssertions
             );
         }
 
-        Assert::fail('Failed asserting that response contains an Inertia page.');
+        Assert::fail(
+            'Failed asserting that response contains an Inertia page.'
+        );
     }
 
     private function hasInertiaPath(array $array, string $path): bool

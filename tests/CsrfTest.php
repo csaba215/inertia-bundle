@@ -273,7 +273,10 @@ class CsrfTest extends InertiaBaseConfig
 
         $listener->onKernelRequest($event);
 
-        $this->assertSame(Response::HTTP_CONFLICT, $event->getResponse()->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_CONFLICT,
+            $event->getResponse()->getStatusCode()
+        );
         $this->assertSame(
             'http://localhost/dashboard',
             $event->getResponse()->headers->get('X-Inertia-Location')
@@ -307,7 +310,10 @@ class CsrfTest extends InertiaBaseConfig
 
         $listener->onKernelResponse($event);
 
-        $this->assertSame(Response::HTTP_SEE_OTHER, $event->getResponse()->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_SEE_OTHER,
+            $event->getResponse()->getStatusCode()
+        );
     }
 
     public function testDebugAjaxRequestSetsToolbarReplaceHeader()
@@ -363,7 +369,9 @@ class CsrfTest extends InertiaBaseConfig
 
         $this->assertCount(
             0,
-            $event->getResponse()->headers->getCookies(ResponseHeaderBag::COOKIES_FLAT)
+            $event
+                ->getResponse()
+                ->headers->getCookies(ResponseHeaderBag::COOKIES_FLAT)
         );
     }
 }
