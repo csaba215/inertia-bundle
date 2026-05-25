@@ -2,11 +2,11 @@
 
 namespace Rompetomp\InertiaBundle\Tests;
 
+use Rompetomp\InertiaBundle\Architecture\FluentInertiaResponse;
 use Rompetomp\InertiaBundle\Service\InertiaService;
 use Rompetomp\InertiaBundle\Tests\Fixtures\InertiaBaseConfig;
 use Rompetomp\InertiaBundle\Testing\InertiaAssertions;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -107,7 +107,7 @@ class InertiaServiceTest extends InertiaBaseConfig
         );
 
         $response = $this->inertia->render('Dashboard');
-        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertInstanceOf(FluentInertiaResponse::class, $response);
         $this->assertNotEquals('Accept', $response->headers->get('Vary'));
     }
 
@@ -211,6 +211,74 @@ class InertiaServiceTest extends InertiaBaseConfig
             'test-value',
             json_decode($response->getContent(), true)['props']['test']
         );
+    }
+
+    public function testFluentResponseCanAddPropsBeforeRendering()
+    {
+        $this->bootInertiaRequest(['X-Inertia' => true]);
+
+        $response = $this->inertia
+            ->render('Dashboard', ['name' => 'Ada'])
+            ->with('role', 'admin')
+            ->with(['team' => 'core']);
+
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(
+            [
+                'name' => 'Ada',
+                'role' => 'admin',
+                'team' => 'core',
+                'errors' => [],
+            ],
+            $data['props']
+        );
+    }
+
+    public function testFluentResponseCanOverrideRootViewAndViewData()
+    {
+        $request = Request::create('https://example.test/dashboard');
+        $this->requestStack
+            ->allows()
+            ->getCurrentRequest()
+            ->andReturns($request);
+        $this->environment
+            ->shouldReceive('render')
+            ->once()
+            ->with(
+                'inertia.twig.html',
+                \Mockery::on(
+                    fn(array $data) => $data['viewData'] === [
+                        'title' => 'Dashboard',
+                    ] && $data['page']['component'] === 'Dashboard'
+                )
+            )
+            ->andReturn('<div>Dashboard</div>');
+
+        $response = $this->inertia
+            ->render('Dashboard')
+            ->withViewData('title', 'Dashboard')
+            ->rootView('inertia.twig.html');
+
+        $this->assertSame('<div>Dashboard</div>', $response->getContent());
+    }
+
+    public function testFluentResponseCanFlashDataBeforeRendering()
+    {
+        $request = Request::create('https://example.test/dashboard');
+        $request->headers->set('X-Inertia', true);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $this->requestStack
+            ->allows()
+            ->getCurrentRequest()
+            ->andReturns($request);
+
+        $response = $this->inertia
+            ->render('Dashboard')
+            ->flash('notice', 'Saved');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(['notice' => 'Saved'], $data['flash']);
     }
 
     public function testLegacyLazyPropResolvesOnlyWhenRequested()

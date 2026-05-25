@@ -5,6 +5,7 @@ namespace Rompetomp\InertiaBundle\Service;
 use Closure;
 use Rompetomp\InertiaBundle\Architecture\AlwaysProp;
 use Rompetomp\InertiaBundle\Architecture\DeferredProp;
+use Rompetomp\InertiaBundle\Architecture\FluentInertiaResponse;
 use Rompetomp\InertiaBundle\Architecture\InertiaInterface;
 use Rompetomp\InertiaBundle\Architecture\LazyProp;
 use Rompetomp\InertiaBundle\Architecture\MergeProp;
@@ -286,10 +287,35 @@ class InertiaService implements InertiaInterface
         array $context = [],
         ?string $url = null
     ): Response {
+        $this->ensureComponentExists($component);
+
+        return new FluentInertiaResponse(
+            $this,
+            $component,
+            $props,
+            $viewData,
+            $context,
+            $url
+        );
+    }
+
+    /**
+     * @internal
+     */
+    public function renderResponse(
+        string $component,
+        array $props = [],
+        array $viewData = [],
+        array $context = [],
+        ?string $url = null,
+        ?string $rootView = null
+    ): Response {
+        $rootView = $rootView ?? $this->rootView;
+
         /**
          * If the root view is not set, throw an exception.
          */
-        if ($this->rootView === null) {
+        if ($rootView === null) {
             throw new RuntimeError(
                 'The root view is not set. Inertia bundle requires a root view to render the page, set one globally in config/packages/inertia.yaml or pass it to the render method.'
             );
@@ -379,7 +405,7 @@ class InertiaService implements InertiaInterface
         $response = new Response();
 
         $response->setContent(
-            $this->engine->render($this->rootView, compact('page', 'viewData'))
+            $this->engine->render($rootView, compact('page', 'viewData'))
         );
 
         return $response;
